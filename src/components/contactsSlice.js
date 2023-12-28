@@ -1,29 +1,49 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// Create a slice of the Redux store
+const BASE_URL = 'https://658dd9907c48dce94739c843.mockapi.io/contacts';
+
+export const fetchContacts = createAsyncThunk('contacts/fetchAll', async () => {
+  const response = await fetch(BASE_URL);
+  return response.json();
+});
+
+export const addContact = createAsyncThunk('contacts/addContact', async (contact) => {
+  const response = await fetch(BASE_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(contact),
+  });
+  return response.json();
+});
+
+export const deleteContact = createAsyncThunk('contacts/deleteContact', async (id) => {
+  await fetch(`${BASE_URL}/${id}`, {
+    method: 'DELETE',
+  });
+  return id;
+});
+
 const contactsSlice = createSlice({
   name: 'contacts',
   initialState: { contacts: [], filter: '' },
   reducers: {
-      //  Reducer for adding a new contact
-    addContact: (state, action) => {
-      //  Check if a contact with the same name already exists
-      const doesExist = state.contacts.some(
-        contact => contact.name.toLowerCase() === action.payload.name.toLowerCase()
-      );
-
-      // If the contact does not already exist, add it to the state
-      if (!doesExist) {
-        state.contacts.push(action.payload);
-      }
-    },
-    //  Reducer for deleting a contact
-    deleteContact: (state, action) => {
-      state.contacts = state.contacts.filter(contact => contact.id !== action.payload);
-    },
     setFilter: (state, action) => {
       state.filter = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchContacts.fulfilled, (state, action) => {
+        state.contacts = action.payload;
+      })
+      .addCase(addContact.fulfilled, (state, action) => {
+        state.contacts.push(action.payload);
+      })
+      .addCase(deleteContact.fulfilled, (state, action) => {
+        state.contacts = state.contacts.filter(contact => contact.id !== action.payload);
+      });
   },
 });
 

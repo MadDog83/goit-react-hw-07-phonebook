@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import { actions } from '../contactsSlice'; 
+import { deleteContact } from '../contactsSlice'; 
 import styled from 'styled-components';
 
 const ButtonDel = styled.button`
@@ -20,7 +20,7 @@ const ContactListItem = ({ contact }) => {
   return (
     <li>
       {contact.name}: {contact.number}
-      <ButtonDel onClick={() => dispatch(actions.deleteContact(contact.id))}>Delete</ButtonDel>
+      <ButtonDel onClick={() => dispatch(deleteContact(contact.id))}>Delete</ButtonDel>
     </li>
   );
 };

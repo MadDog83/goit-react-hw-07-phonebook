@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { useDispatch, useSelector } from 'react-redux';
-import { actions } from '../contactsSlice'; 
+import { fetchContacts, addContact } from '../contactsSlice'; 
 import styled from 'styled-components';
 
 const FormContainer = styled.form`
@@ -55,6 +55,11 @@ const ContactForm = () => {
   const [number, setNumber] = useState('');
   const dispatch = useDispatch();
   
+  // Fetch contacts when the component mounts
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
   // Get the current list of contacts from the Redux store
   const contacts = useSelector(state => state.contacts.contacts);
 
@@ -81,7 +86,7 @@ const ContactForm = () => {
     if (doesExist) {
       alert(`${newContact.name} is already in contacts.`);
     } else {
-      dispatch(actions.addContact(newContact));
+      dispatch(addContact(newContact));
     }
      setName('');
      setNumber('');
